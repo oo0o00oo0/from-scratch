@@ -334,6 +334,8 @@ const SomeRenderer = {
 
 function Counter() {
   const [state, setState] = SomeRenderer.useState(1)
+
+  console.log("render")
   return <h1 onClick={() => setState((c) => c + 1)}>Counting state: {state}</h1>
 }
 const element = <Counter />
