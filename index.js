@@ -16,8 +16,18 @@ import { fileURLToPath } from "url"
 import path from "path"
 import express from "express"
 import cors from "cors"
+import chokidar from "chokidar"
+
+// https://www.alexander-morse.com/blog/live-reloading-from-scratch-in-nodejs/
+//github.com/webpack/docs/wiki/hot-module-replacement-with-webpack
+
+// https://roadtolarissa.com/hot-reload/
 
 import bodyParser from "body-parser"
+
+chokidar.watch("./src").on("all", (event, path) => {
+  console.log(event, path)
+})
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -29,7 +39,7 @@ const publicDir = path.join(__dirname, "public")
 const srcDir = path.join(__dirname, "src")
 
 const entry = path.join(__dirname, "index.html")
-const page = path.join(srcDir, "pages/statemanage.html")
+// const page = path.join(srcDir, "pages/statemanage.html")
 
 app.use(bodyParser.json())
 app.use(cors())
