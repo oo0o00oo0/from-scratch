@@ -203,6 +203,34 @@ function updateFunctionComponent(fiber) {
   reconcileChildren(fiber, children)
 }
 
+function useEffect(callback, dependencies) {
+  const oldHook =
+    wipFiber.alternate &&
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hooks[hookIndex]
+  const hook = {
+    value: dependencies,
+    cleanup: null, // this will store the cleanup function
+  }
+
+  if (oldHook) {
+    const oldDependencies = oldHook.value
+    const dependenciesChanged = dependencies.some(
+      (dep, i) => !Object.is(dep, oldDependencies[i])
+    )
+
+    // if dependencies array has changed or doesn't exist, run effect
+    if (!oldDependencies || dependenciesChanged) {
+      hook.effect = callback
+    }
+  } else {
+    hook.effect = callback // if the hook is being run for the first time, run effect
+  }
+
+  wipFiber.hooks.push(hook)
+  hookIndex++
+}
+
 function useState(initial) {
   console.log("wipFiber", wipFiber?.alternate?.hooks[hookIndex].state)
   const oldHook =
@@ -296,19 +324,19 @@ function reconcileChildren(wipFiber, elements) {
   }
 }
 
-const Didact = {
+const SomeRenderer = {
   createElement,
   render,
   useState,
 }
 
-/** @jsx Didact.createElement */
+/** @jsx SomeRenderer.createElement */
 
 function Counter() {
-  const [state, setState] = Didact.useState(1)
+  const [state, setState] = SomeRenderer.useState(1)
   return <h1 onClick={() => setState((c) => c + 1)}>Count: {state}</h1>
 }
 const element = <Counter />
 const container = document.getElementById("root")
 
-Didact.render(element, container)
+SomeRenderer.render(element, container)
